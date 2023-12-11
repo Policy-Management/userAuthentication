@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "policy",url = "localhost:8081")
+@FeignClient(name = "policy",url = "https://djrjhdm4vg.execute-api.ap-south-1.amazonaws.com/Prod")
 public interface PolicyProxy {
     @PostMapping("/save")
     public ResponseEntity<?> savePolicy(@RequestBody PolicyEntity policy);
