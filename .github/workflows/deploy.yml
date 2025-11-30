@@ -1,0 +1,38 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main  # Set this to your default branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17' # Ensure this matches your project version
+        distribution: 'corretto'
+
+    - name: Build with Maven
+      # Ensure you are building the shaded/uber jar required for Lambda
+      run: mvn clean package -DskipTests
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1 
+
+    - name: Update Lambda Function Code
+      run: |
+        # Replace 'my-app-0.0.1-SNAPSHOT.jar' with your actual jar name from target/
+        aws lambda update-function-code \
+          --function-name user-policy-userPolicyFunction-4Ra7HaR5OAPp \
+          --zip-file fileb://target/my-app-0.0.1-SNAPSHOT.jar
