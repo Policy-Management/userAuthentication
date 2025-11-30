@@ -3,7 +3,7 @@ name: Deploy to AWS Lambda
 on:
   push:
     branches:
-      - production  # Set this to your default branch
+      - production
 
 jobs:
   deploy:
@@ -16,11 +16,11 @@ jobs:
     - name: Set up JDK 25
       uses: actions/setup-java@v4
       with:
-        java-version: '25' # Ensure this matches your project version
-        distribution: 'corretto'
+        java-version: '25'
+        distribution: 'temurin' # Switched to Temurin for better Java 25 support
 
     - name: Build with Maven
-      # Ensure you are building the shaded/uber jar required for Lambda
+      # We use the wildcard *.jar to avoid naming errors if the version changes
       run: mvn clean package -DskipTests
 
     - name: Configure AWS Credentials
@@ -32,7 +32,8 @@ jobs:
 
     - name: Update Lambda Function Code
       run: |
-        # Replace 'my-app-0.0.1-SNAPSHOT.jar' with your actual jar name from target/
+        # Use a wildcard to find the jar regardless of version number
+        # userAuthentication-0.0.1-SNAPSHOT.jar is the expected name
         aws lambda update-function-code \
           --function-name user-policy-userPolicyFunction-4Ra7HaR5OAPp \
-          --zip-file fileb://target/my-app-0.0.1-SNAPSHOT.jar
+          --zip-file fileb://target/userAuthentication-*.jar
